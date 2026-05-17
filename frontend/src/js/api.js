@@ -2,7 +2,7 @@
 async function processWorkflowUpdate(formData) {
     try {
         // Ensure this port matches your Flask backend port (default 5000)
-        const response = await fetch('http://localhost:5000/api/process-update', {
+        const response = await fetch('https://inboxintel-automator.onrender.com', {
             method: 'POST',
             body: formData 
         });
