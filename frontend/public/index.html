@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>InboxIntel - Smart Task Automator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-[#fdfbf7] text-gray-800 font-sans min-h-screen">
+    
+    <div class="max-w-5xl mx-auto py-10 px-5 grid grid-cols-1 lg:grid-cols-3 gap-8">
+        
+        <div class="lg:col-span-2">
+            <div class="text-left mb-8">
+                <h1 class="text-4xl font-bold text-[#2c3e2e] mb-2">InboxIntel Task Automator</h1>
+                <p class="text-gray-500">Intelligent Expertise-Based Task Assignment</p>
+            </div>
+
+            <div class="bg-white p-8 rounded-lg shadow-sm border border-gray-200 mb-6">
+                <h2 class="text-xl font-bold text-[#2c3e2e] mb-4 border-b pb-2">Step 1: Project Details</h2>
+                <form id="workflow-form" class="space-y-6" onsubmit="event.preventDefault();">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">How many group members?</label>
+                        <input type="number" id="member-count" min="1" max="10" class="w-24 p-2 border border-gray-300 rounded outline-none focus:border-[#c48f56]">
+                    </div>
+                    <div id="dynamic-members" class="grid grid-cols-1 sm:grid-cols-2 gap-4"></div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Project Update (Text or File)</label>
+                        <textarea id="raw-text" rows="5" class="w-full p-3 border border-gray-300 rounded outline-none focus:border-[#c48f56]" placeholder="Paste your raw team updates here..."></textarea>
+                    </div>
+                    <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:bg-gray-50 transition relative">
+                        <input type="file" id="file-upload" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" accept=".pdf,.txt">
+                        <div class="text-gray-500 pointer-events-none">
+                            <span class="text-[#c48f56] font-medium">Click to upload</span> PDF or Text file
+                            <p id="file-name-display" class="text-sm text-gray-400 mt-2"></p>
+                        </div>
+                    </div>
+                    <button type="button" id="analyze-btn" class="w-full bg-[#2c3e2e] text-white font-bold py-3 px-4 rounded hover:bg-opacity-90 transition duration-200">
+                        Analyze Required Expertise
+                    </button>
+                </form>
+            </div>
+
+            <div id="mapping-section" class="bg-white p-8 rounded-lg shadow-sm border border-gray-200 mb-6 hidden">
+                <h2 class="text-xl font-bold text-[#c48f56] mb-2 border-b pb-2">Step 2: Assign Experts</h2>
+                <p class="text-sm text-gray-500 mb-6">AI has identified the following required skills. Please select the best team member for each.</p>
+                <form id="mapping-form" class="space-y-4" onsubmit="event.preventDefault();">
+                    <div id="skills-container" class="space-y-4"></div>
+                    <button type="button" id="assign-tasks-btn" class="w-full bg-[#c48f56] text-white font-bold py-3 px-4 rounded hover:bg-opacity-90 transition duration-200 mt-6">
+                        Confirm & Assign Tasks
+                    </button>
+                </form>
+            </div>
+
+            <div id="output-section" class="hidden mt-6">
+                <h2 class="text-2xl font-bold text-[#2c3e2e] mb-6 border-b pb-2">Final Assigned Tasks</h2>
+                <div id="tasks-container" class="grid grid-cols-1 md:grid-cols-2 gap-6"></div>
+            </div>
+        </div>
+
+        <div class="lg:col-span-1">
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200 h-[600px] flex flex-col sticky top-10">
+                <div class="p-4 bg-[#2c3e2e] text-white rounded-t-lg">
+                    <h3 class="font-bold text-lg">Project Assistant Chat</h3>
+                    <p class="text-xs text-gray-300">Ask anything about the uploaded project.</p>
+                </div>
+                
+                <div id="chat-body" class="flex-1 p-4 overflow-y-auto bg-gray-50 space-y-4 text-sm">
+                    <div class="flex w-full justify-start">
+                        <div class="bg-white border border-gray-200 text-gray-800 p-3 rounded-lg rounded-tl-none max-w-[85%] shadow-sm">
+                            Hi! Upload your project update, then ask me questions about it!
+                        </div>
+                    </div>
+                </div>
+
+                <div class="p-4 border-t border-gray-200 bg-white rounded-b-lg">
+                    <div class="flex space-x-2">
+                        <input type="text" id="chat-input" class="flex-1 p-2 border border-gray-300 rounded outline-none focus:border-[#c48f56] text-sm" placeholder="Ask a question...">
+                        <button id="chat-send-btn" class="bg-[#c48f56] text-white px-4 py-2 rounded font-bold hover:bg-opacity-90">Send</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script src="../src/js/ui.js"></script>
+    <script src="../src/js/main.js"></script>
+    <script src="../src/js/chat.js"></script> <script>
+        document.getElementById('file-upload').addEventListener('change', function(e) {
+            const fileName = e.target.files[0] ? e.target.files[0].name : '';
+            document.getElementById('file-name-display').textContent = fileName;
+        });
+    </script>
+</body>
+</html>

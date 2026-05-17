@@ -1,0 +1,22 @@
+# Environments & Secrets (NEVER PUSH THESE)
+venv/
+.env
+
+# Python Cache
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# Node/Frontend Build Tools
+node_modules/
+npm-debug.log
+
+# Database Files (Local history should stay local)
+database/*.db
+*.sqlite3
+*.db
+app.db
+
+# OS System Files
+.DS_Store
+Thumbs.db
