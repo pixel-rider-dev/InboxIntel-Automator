@@ -1,3 +1,37 @@
+// ==========================================
+// WHATSAPP NOTIFICATION FEATURE
+// ==========================================
+
+// Apne 5 group members ke asli numbers yahan update karein (country code 92 ke sath, bina + ya 0 ke)
+const teamNumbers = {
+    "Ali": "923498913992",
+    "Mohiz": "923091511363",
+    "Usman": "923185640987",
+    "Uu": "923328338223", // 4th member ka naam aur number likhein
+    "Member 5": "923000000000"  // 5th member ka naam aur number likhein
+};
+
+// WhatsApp bhejne ka main function
+window.sendWhatsAppTask = function(assigneeName, taskDetails) {
+    const phoneNumber = teamNumbers[assigneeName];
+    
+    if (!phoneNumber) {
+        alert(assigneeName + " ka phone number system mein update nahi hai. Pehle code mein number add karein.");
+        return;
+    }
+
+    const customMessage = `Assalam o Alaikum ${assigneeName},\n\nAI Workflow Automation system ne aapko ek naya task assign kiya hai:\n\n*Task:* ${taskDetails}\n\nPlease isay waqt par complete karein.`;
+    const encodedMessage = encodeURIComponent(customMessage);
+    
+    const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodedMessage}`;
+    window.open(whatsappUrl, "_blank");
+};
+
+
+// ==========================================
+// ORIGINAL UI FUNCTIONS
+// ==========================================
+
 // Function 1: Group Members ke sirf Name boxes
 function generateMemberInputs(count) {
     const container = document.getElementById('dynamic-members');
@@ -56,7 +90,7 @@ function renderSkillMapping(skills, membersList) {
     });
 }
 
-// Function 3: Final Output Cards
+// Function 3: Final Output Cards (UPDATED WITH WHATSAPP BUTTON)
 function renderTasks(tasks) {
     const container = document.getElementById('tasks-container');
     if (!container) return;
@@ -69,11 +103,25 @@ function renderTasks(tasks) {
 
     tasks.forEach(task => {
         const card = document.createElement('div');
-        card.className = 'bg-white p-5 rounded border border-gray-200 shadow-sm border-l-4 border-l-[#c48f56]';
+        // Card ko flex-col diya hai taake button hamesha neechay rahay
+        card.className = 'bg-white p-5 rounded border border-gray-200 shadow-sm border-l-4 border-l-[#c48f56] flex flex-col justify-between h-full';
+        
+        // Card ka content aur naya WhatsApp button (Tailwind classes ke sath)
         card.innerHTML = `
-            <h3 class="font-bold text-[#2c3e2e] mb-2">${task.task_name || 'Unnamed Task'}</h3>
-            <p class="text-sm text-gray-600 mb-1"><strong>Assignee:</strong> <span class="font-bold text-[#c48f56]">${task.assignee || 'Unassigned'}</span></p>
-            <p class="text-sm text-gray-600"><strong>Deadline:</strong> <span class="bg-yellow-100 text-yellow-800 px-2 py-0.5 rounded text-xs">${task.deadline || 'No Deadline'}</span></p>
+            <div>
+                <h3 class="font-bold text-[#2c3e2e] mb-2">${task.task_name || 'Unnamed Task'}</h3>
+                <p class="text-sm text-gray-600 mb-1"><strong>Assignee:</strong> <span class="font-bold text-[#c48f56]">${task.assignee || 'Unassigned'}</span></p>
+                <p class="text-sm text-gray-600 mb-4"><strong>Deadline:</strong> <span class="bg-yellow-100 text-yellow-800 px-2 py-0.5 rounded text-xs">${task.deadline || 'No Deadline'}</span></p>
+            </div>
+            <button 
+                onclick="window.sendWhatsAppTask('${task.assignee}', '${task.task_name}')" 
+                class="w-full bg-[#25D366] hover:bg-[#1ebe57] text-white font-bold py-2 px-4 rounded transition duration-200 flex items-center justify-center gap-2"
+            >
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M13.601 2.326A7.85 7.85 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c0 1.399.366 2.76 1.057 3.965L0 16l4.204-1.102a7.9 7.9 0 0 0 3.79.965h.004c4.368 0 7.926-3.558 7.93-7.93A7.9 7.9 0 0 0 13.6 2.326zM7.994 14.521a6.6 6.6 0 0 1-3.356-.92l-.24-.144-2.494.654.666-2.433-.156-.251a6.56 6.56 0 0 1-1.007-3.505c0-3.626 2.957-6.584 6.591-6.584a6.56 6.56 0 0 1 4.66 1.931 6.56 6.56 0 0 1 1.928 4.66c-.004 3.639-2.961 6.592-6.592 6.592m3.615-4.934c-.197-.099-1.17-.578-1.353-.646-.182-.065-.315-.099-.445.099-.133.197-.513.646-.627.775-.114.133-.232.148-.43.05-.197-.1-.836-.308-1.592-.985-.59-.525-.985-1.175-1.103-1.372-.114-.198-.011-.304.088-.403.087-.088.197-.232.296-.346.1-.114.133-.198.198-.33.065-.134.034-.248-.015-.347-.05-.099-.445-1.076-.612-1.47-.16-.389-.323-.335-.445-.34-.114-.007-.247-.007-.38-.007a.73.73 0 0 0-.529.247c-.182.198-.691.677-.691 1.654s.71 1.916.81 2.049c.098.133 1.394 2.132 3.383 2.992.47.205.84.326 1.129.418.475.152.904.129 1.246.08.38-.058 1.171-.48 1.338-.943.164-.464.164-.86.114-.943-.049-.084-.182-.133-.38-.232"/>
+                </svg>
+                Notify via WhatsApp
+            </button>
         `;
         container.appendChild(card);
     });
