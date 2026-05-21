@@ -62,7 +62,7 @@ def extract_tasks(text, expertise_mapping):
         print(f"LLM Task Assignment Error: {e}")
         return []
 
-# NAYA CHAT FUNCTION (Updated to stop hallucination and fix language)
+# New CHAT FUNCTION (Updated to stop hallucination and fix language)
 def project_chat(question, context):
     prompt = f"""
     You are an intelligent project assistant for a team. Answer the user's question based strictly on the Project Context below.

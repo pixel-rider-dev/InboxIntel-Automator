@@ -17,7 +17,8 @@ def create_app(config_class=Config):
     from backend.app.routes import bp as main_bp
     app.register_blueprint(main_bp)
 
-    # Pehli dafa run hone par tables create karna
+    #On first run, create the tables.
+
     with app.app_context():
         db.create_all()
 

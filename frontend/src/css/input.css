@@ -7,7 +7,7 @@ body {
   color: theme('colors.earth-dark');
 }
 
-/* Custom fade-in animation card ke liye */
+/* Custom fade-in animation for card*/
 .fade-in {
   animation: fadeIn 0.4s ease-in-out;
 }

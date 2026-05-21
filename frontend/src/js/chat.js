@@ -24,7 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
         addMessage(question, true);
         chatInput.value = '';
 
-        // NAYA LOGIC: Dropdowns se current mapping uthana
+        // New logic: Fetch current mapping from dropdowns.
         let currentMapping = "";
         const skillLabels = document.querySelectorAll('.skill-name');
         const expertSelects = document.querySelectorAll('.expert-select');
@@ -43,7 +43,8 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
-        // Text aur Dropdown mapping ko mila kar context banana
+        // Create context by combining text and dropdown mappings.
+
         const context = (window.globalCombinedText || "") + currentMapping;
         
         if (!context.trim()) {

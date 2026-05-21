@@ -48,7 +48,7 @@ def process_update():
 
     return jsonify({"message": "Tasks assigned successfully", "tasks": saved_tasks}), 200
 
-# NAYA CHAT ROUTE
+# New chat route
 @bp.route('/chat', methods=['POST'])
 def chat_route():
     question = request.form.get('question', '')
