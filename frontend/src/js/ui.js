@@ -1,28 +1,31 @@
 // ==========================================
-// WHATSAPP NOTIFICATION FEATURE
+// WHATSAPP NOTIFICATION FEATURE (FINAL FORMAT)
 // ==========================================
 
-// Apne 5 group members ke asli numbers yahan update karein (country code 92 ke sath, bina + ya 0 ke)
 const teamNumbers = {
-    "Ali": "923498913992",
-    "Mohiz": "923091511363",
-    "Usman": "923185640987",
-    "Uu": "923328338223", // 4th member ka naam aur number likhein
-    "Member 5": "923000000000"  // 5th member ka naam aur number likhein
+    "ali": "92309 1511363",
+    "mohiz": "923498913992",
+    "usman": "923185640987", // Apna asli number
+    "member 4": "923000000000",
+    "member 5": "923000000000"
 };
 
-// WhatsApp bhejne ka main function
-window.sendWhatsAppTask = function(assigneeName, taskDetails) {
-    const phoneNumber = teamNumbers[assigneeName];
+window.sendWhatsAppTask = function(assigneeName, taskDetails, taskDeadline) {
+    const cleanName = assigneeName.toLowerCase().trim();
+    const phoneNumber = teamNumbers[cleanName];
     
     if (!phoneNumber) {
         alert(assigneeName + " ka phone number system mein update nahi hai. Pehle code mein number add karein.");
         return;
     }
 
-    const customMessage = `Assalam o Alaikum ${assigneeName},\n\nAI Workflow Automation system ne aapko ek naya task assign kiya hai:\n\n*Task:* ${taskDetails}\n\nPlease isay waqt par complete karein.`;
-    const encodedMessage = encodeURIComponent(customMessage);
+    const deadline = taskDeadline || window.globalDeadline || "No Deadline";
+    const formattedName = cleanName.charAt(0).toUpperCase() + cleanName.slice(1);
     
+    // --- NAYA CHANGE: Exact required message format ---
+    const customMessage = `Assalam o Alaikum ${formattedName},\n\nAI Workflow Automation system ne aapko ek naya task assign kiya hai:\n\n*Task:* ${taskDetails}\n\n*Deadline:* ${deadline}`;
+    
+    const encodedMessage = encodeURIComponent(customMessage);
     const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodedMessage}`;
     window.open(whatsappUrl, "_blank");
 };
@@ -32,7 +35,6 @@ window.sendWhatsAppTask = function(assigneeName, taskDetails) {
 // ORIGINAL UI FUNCTIONS
 // ==========================================
 
-// Function 1: Group Members ke sirf Name boxes
 function generateMemberInputs(count) {
     const container = document.getElementById('dynamic-members');
     if (!container) return;
@@ -47,7 +49,6 @@ function generateMemberInputs(count) {
     }
 }
 
-// Function 2: AI Skills ko Insaan (Members) se map karne ke dropdowns
 function renderSkillMapping(skills, membersList) {
     const container = document.getElementById('skills-container');
     if (!container) return;
@@ -70,13 +71,11 @@ function renderSkillMapping(skills, membersList) {
         const selectBox = document.createElement('select');
         selectBox.className = 'expert-select w-1/2 p-2 border border-gray-300 rounded outline-none focus:border-[#c48f56] bg-white';
         
-        // Default option
         const defaultOpt = document.createElement('option');
         defaultOpt.value = '';
         defaultOpt.textContent = '-- Select Expert --';
         selectBox.appendChild(defaultOpt);
 
-        // Members dropdown options
         membersList.forEach(member => {
             const opt = document.createElement('option');
             opt.value = member;
@@ -90,7 +89,6 @@ function renderSkillMapping(skills, membersList) {
     });
 }
 
-// Function 3: Final Output Cards (UPDATED WITH WHATSAPP BUTTON)
 function renderTasks(tasks) {
     const container = document.getElementById('tasks-container');
     if (!container) return;
@@ -103,10 +101,8 @@ function renderTasks(tasks) {
 
     tasks.forEach(task => {
         const card = document.createElement('div');
-        // Card ko flex-col diya hai taake button hamesha neechay rahay
         card.className = 'bg-white p-5 rounded border border-gray-200 shadow-sm border-l-4 border-l-[#c48f56] flex flex-col justify-between h-full';
         
-        // Card ka content aur naya WhatsApp button (Tailwind classes ke sath)
         card.innerHTML = `
             <div>
                 <h3 class="font-bold text-[#2c3e2e] mb-2">${task.task_name || 'Unnamed Task'}</h3>
@@ -114,7 +110,7 @@ function renderTasks(tasks) {
                 <p class="text-sm text-gray-600 mb-4"><strong>Deadline:</strong> <span class="bg-yellow-100 text-yellow-800 px-2 py-0.5 rounded text-xs">${task.deadline || 'No Deadline'}</span></p>
             </div>
             <button 
-                onclick="window.sendWhatsAppTask('${task.assignee}', '${task.task_name}')" 
+                onclick="window.sendWhatsAppTask('${task.assignee}', '${task.task_name}', '${task.deadline}')" 
                 class="w-full bg-[#25D366] hover:bg-[#1ebe57] text-white font-bold py-2 px-4 rounded transition duration-200 flex items-center justify-center gap-2"
             >
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
@@ -127,7 +123,6 @@ function renderTasks(tasks) {
     });
 }
 
-// Function 4: Button State
 function setButtonState(btnId, isLoading, defaultText) {
     const btn = document.getElementById(btnId);
     if (!btn) return;

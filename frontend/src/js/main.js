@@ -2,10 +2,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const memberCountInput = document.getElementById('member-count');
     const analyzeBtn = document.getElementById('analyze-btn'); 
     const assignBtn = document.getElementById('assign-tasks-btn'); 
-    const BASE_URL = 'http://127.0.0.1:5000/api';
     
-    // Naya Change: Is variable ko window mein daal diya taake chat.js isay read kar sakay
+    // Render Server Link
+    const BASE_URL = 'https://inboxintel-automator.onrender.com/api';
+    
     window.globalCombinedText = "";
+    window.globalDeadline = "No Deadline";
+    window.globalTotalMembers = 0;
     let savedMembers = [];
 
     if (memberCountInput) {
@@ -55,7 +58,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (assignBtn) {
         assignBtn.addEventListener('click', async (e) => {
             e.preventDefault();
-            setButtonState('assign-tasks-btn', true, 'Confirm & Assign Tasks');
+            
             const skillLabels = document.querySelectorAll('.skill-name');
             const expertSelects = document.querySelectorAll('.expert-select');
             let mappingList = [];
@@ -70,9 +73,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (!allSelected) {
                 alert("Please assign an expert to ALL required skills!");
-                setButtonState('assign-tasks-btn', false, 'Confirm & Assign Tasks');
                 return;
             }
+
+            // --- NAYA CHANGE: "1 week" option added in prompt ---
+            const userDeadline = prompt("Enter the deadline for these tasks (e.g., 2 days, 3 days, 1 week, Tomorrow):", "2 days");
+            
+            if (userDeadline === null) {
+                return; 
+            }
+
+            window.globalDeadline = userDeadline;
+            window.globalTotalMembers = savedMembers.length; 
+
+            setButtonState('assign-tasks-btn', true, 'Confirm & Assign Tasks');
 
             const formData = new FormData();
             formData.append('text', window.globalCombinedText); 
@@ -83,6 +97,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 const result = await response.json();
                 
                 if (result.tasks) {
+                    result.tasks.forEach(t => t.deadline = window.globalDeadline);
+                    
                     renderTasks(result.tasks);
                     const outSection = document.getElementById('output-section');
                     outSection.classList.remove('hidden');
