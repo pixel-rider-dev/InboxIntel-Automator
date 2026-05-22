@@ -123,3 +123,8 @@ function setButtonState(btnId, isLoading, defaultText) {
         btn.classList.remove('opacity-70', 'cursor-not-allowed');
     }
 }
+document.getElementById('member-count').addEventListener('input', function(e) {
+    if(window.generateMemberInputs) {
+        window.generateMemberInputs(e.target.value);
+    }
+});
