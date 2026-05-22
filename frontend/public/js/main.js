@@ -1,14 +1,3 @@
-// ==========================================
-// WHATSAPP NOTIFICATION FEATURE (FINAL FORMAT)
-// ==========================================
-
-const teamNumbers = {
-    "ali": "923091511363",
-    "mohiz": "923498913992",
-    "usman": "923185640987", 
-    "member 4": "923000000000",
-    "member 5": "923000000000"
-};
 
 window.sendWhatsAppTask = function(assigneeName, taskDetails, taskDeadline) {
     const cleanName = assigneeName.toLowerCase().trim();
