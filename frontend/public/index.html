@@ -26,7 +26,7 @@
                     <div id="dynamic-members" class="grid grid-cols-1 sm:grid-cols-2 gap-4"></div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-2">Project Update (Text or File)</label>
-                        <textarea id="raw-text" rows="5" class="w-full p-3 border border-gray-300 rounded outline-none focus:border-[#c48f56]" placeholder="Paste your raw team updates here..."></textarea>
+                        <textarea id="project-text" rows="5" class="w-full p-3 border border-gray-300 rounded outline-none focus:border-[#c48f56]" placeholder="Paste your raw team updates here..."></textarea>
                     </div>
                     <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:bg-gray-50 transition relative">
                         <input type="file" id="file-upload" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" accept=".pdf,.txt">
@@ -41,18 +41,18 @@
                 </form>
             </div>
 
-            <div id="mapping-section" class="bg-white p-8 rounded-lg shadow-sm border border-gray-200 mb-6 hidden">
+            <div id="skills-section" class="bg-white p-8 rounded-lg shadow-sm border border-gray-200 mb-6 hidden">
                 <h2 class="text-xl font-bold text-[#c48f56] mb-2 border-b pb-2">Step 2: Assign Experts</h2>
                 <p class="text-sm text-gray-500 mb-6">AI has identified the following required skills. Please select the best team member for each.</p>
                 <form id="mapping-form" class="space-y-4" onsubmit="event.preventDefault();">
                     <div id="skills-container" class="space-y-4"></div>
-                    <button type="button" id="assign-tasks-btn" class="w-full bg-[#c48f56] text-white font-bold py-3 px-4 rounded hover:bg-opacity-90 transition duration-200 mt-6">
+                    <button type="button" id="confirm-btn" class="w-full bg-[#c48f56] text-white font-bold py-3 px-4 rounded hover:bg-opacity-90 transition duration-200 mt-6">
                         Confirm & Assign Tasks
                     </button>
                 </form>
             </div>
 
-            <div id="output-section" class="hidden mt-6">
+            <div id="tasks-section" class="hidden mt-6">
                 <h2 class="text-2xl font-bold text-[#2c3e2e] mb-6 border-b pb-2">Final Assigned Tasks</h2>
                 <div id="tasks-container" class="grid grid-cols-1 md:grid-cols-2 gap-6"></div>
             </div>

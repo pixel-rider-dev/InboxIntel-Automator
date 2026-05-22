@@ -4,7 +4,7 @@
 window.teamNumbers = {
     "usman": "923185640987",
     "ali": "923111111111",
-    "mohiz":923498913992",
+    "mohiz": "923498913992", 
     "fatima": "923333333333",
     "zain": "923444444444"
 };
@@ -46,11 +46,9 @@ window.renderSkillMapping = function(skills, membersList) {
         return; 
     }
 
-    // 🔥 ZABARDASTI UNHIDE KARNE WALI LINES 🔥
     container.classList.remove('hidden');
     container.style.display = 'block';
     
-    // Agar koi main section hai toh usay bhi unhide karo
     const skillsSection = document.getElementById('skills-section') || container.closest('section');
     if (skillsSection) {
         skillsSection.classList.remove('hidden');
@@ -93,7 +91,6 @@ window.renderTasks = function(tasks) {
     const container = document.getElementById('tasks-container');
     if (!container) return;
 
-    // 🔥 ZABARDASTI UNHIDE KARNE WALI LINES 🔥
     container.classList.remove('hidden');
     container.style.display = 'block';
     
@@ -184,7 +181,8 @@ window.onload = function() {
                 const data = await response.json();
                 
                 if (data.skills && data.skills.length > 0) {
-                    console.log("Skills received: ", data.skills); // Yeh check karne ke liye ke data aaya
+                    // Yahan hum combined_text ko save kar rahe hain taa ke step 2 mein use ho sakay
+                    window.fullProjectText = data.combined_text || projectText; 
                     window.renderSkillMapping(data.skills, membersList);
                 } else {
                     alert("AI ne skills khali bheji hain!");
@@ -192,6 +190,7 @@ window.onload = function() {
 
             } catch (error) {
                 console.error("Fetch Error:", error);
+                alert("Backend se connect karne mein masla aa raha hai.");
             } finally {
                 window.setButtonState('analyze-btn', false, 'Analyze Required Expertise');
             }
@@ -209,18 +208,26 @@ window.onload = function() {
             window.setButtonState('confirm-btn', true, 'Assigning Tasks...');
             
             try {
-                const projectText = document.getElementById('project-text') ? document.getElementById('project-text').value : '';
-                const fileInput = document.getElementById('file-upload');
-                const file = fileInput && fileInput.files.length > 0 ? fileInput.files[0] : null;
-                const memberInputs = document.querySelectorAll('.member-name');
-                const membersList = Array.from(memberInputs).map(input => input.value).filter(val => val.trim() !== '');
+                // 1. Dropdowns se data ikhata karna (Expertise Mapping)
+                const expertiseMapping = {};
+                const skillRows = document.querySelectorAll('#skills-container > div');
+                skillRows.forEach(row => {
+                    const skillName = row.querySelector('.skill-name').textContent;
+                    const expertSelected = row.querySelector('.expert-select').value;
+                    if (expertSelected) {
+                        expertiseMapping[skillName] = expertSelected;
+                    }
+                });
 
+                // 2. Sirf wohi data bhejna jo backend /process-update ko chahiye
                 const formData = new FormData();
-                if (file) formData.append('file', file);
-                if (projectText.trim()) formData.append('text', projectText);
-                formData.append('members', JSON.stringify(membersList));
+                const projectText = window.fullProjectText || (document.getElementById('project-text') ? document.getElementById('project-text').value : '');
+                
+                formData.append('text', projectText);
+                formData.append('expertise_mapping', JSON.stringify(expertiseMapping));
 
-                const response = await fetch('https://inboxintel-automator.onrender.com/api/assign-tasks', {
+                // 3. API ka sahi rasta: /process-update
+                const response = await fetch('https://inboxintel-automator.onrender.com/api/process-update', {
                     method: 'POST',
                     body: formData
                 });
@@ -228,6 +235,8 @@ window.onload = function() {
                 const data = await response.json();
                 if (data.tasks) {
                     window.renderTasks(data.tasks);
+                } else if (data.message) {
+                    alert(data.message);
                 }
             } catch (error) {
                 console.error("Assign Error:", error);
