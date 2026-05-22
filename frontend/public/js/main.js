@@ -3,8 +3,8 @@
 // ==========================================
 window.teamNumbers = {
     "usman": "923185640987",
-    "mohiz":"923498913992",
-    "ahmad": "923222222222",
+    "ali": "923111111111",
+    "mohiz":923498913992",
     "fatima": "923333333333",
     "zain": "923444444444"
 };
@@ -24,14 +24,11 @@ window.sendWhatsAppTask = function(assigneeName, taskDetails, taskDeadline) {
 };
 
 // ==========================================
-// 2. UI FUNCTIONS (GLOBAL)
+// 2. UI FUNCTIONS (GLOBAL WITH UNHIDE MAGIC)
 // ==========================================
 window.generateMemberInputs = function(count) {
     const container = document.getElementById('dynamic-members');
-    if (!container) { 
-        alert("System Error: 'dynamic-members' wala box HTML mein nahi mil raha!"); 
-        return; 
-    }
+    if (!container) return; 
     container.innerHTML = ''; 
     for (let i = 1; i <= count; i++) {
         const input = document.createElement('input');
@@ -48,6 +45,18 @@ window.renderSkillMapping = function(skills, membersList) {
         alert("System Error: 'skills-container' wala box HTML mein nahi mil raha!"); 
         return; 
     }
+
+    // 🔥 ZABARDASTI UNHIDE KARNE WALI LINES 🔥
+    container.classList.remove('hidden');
+    container.style.display = 'block';
+    
+    // Agar koi main section hai toh usay bhi unhide karo
+    const skillsSection = document.getElementById('skills-section') || container.closest('section');
+    if (skillsSection) {
+        skillsSection.classList.remove('hidden');
+        skillsSection.style.display = 'block';
+    }
+
     container.innerHTML = ''; 
     if (!skills || skills.length === 0) return;
 
@@ -83,6 +92,17 @@ window.renderSkillMapping = function(skills, membersList) {
 window.renderTasks = function(tasks) {
     const container = document.getElementById('tasks-container');
     if (!container) return;
+
+    // 🔥 ZABARDASTI UNHIDE KARNE WALI LINES 🔥
+    container.classList.remove('hidden');
+    container.style.display = 'block';
+    
+    const tasksSection = document.getElementById('tasks-section') || container.closest('section');
+    if (tasksSection) {
+        tasksSection.classList.remove('hidden');
+        tasksSection.style.display = 'block';
+    }
+
     container.innerHTML = ''; 
     
     tasks.forEach(task => {
@@ -115,7 +135,7 @@ window.setButtonState = function(btnId, isLoading, defaultText) {
 };
 
 // ==========================================
-// 3. EVENT LISTENERS (BUTTON CLICKS)
+// 3. EVENT LISTENERS
 // ==========================================
 window.onload = function() {
     
@@ -136,7 +156,6 @@ window.onload = function() {
             const fileInput = document.getElementById('file-upload');
             const file = fileInput && fileInput.files.length > 0 ? fileInput.files[0] : null;
             
-            // Get Member Names
             const memberInputs = document.querySelectorAll('.member-name');
             const membersList = Array.from(memberInputs).map(input => input.value).filter(val => val.trim() !== '');
 
@@ -159,16 +178,16 @@ window.onload = function() {
                 });
 
                 if (!response.ok) {
-                    alert("Backend Error! Status: " + response.status);
                     throw new Error("Server Error");
                 }
 
                 const data = await response.json();
                 
                 if (data.skills && data.skills.length > 0) {
+                    console.log("Skills received: ", data.skills); // Yeh check karne ke liye ke data aaya
                     window.renderSkillMapping(data.skills, membersList);
                 } else {
-                    alert("Python server chal gaya, lekin usne 'skills' khali bheji hain!");
+                    alert("AI ne skills khali bheji hain!");
                 }
 
             } catch (error) {
@@ -209,8 +228,6 @@ window.onload = function() {
                 const data = await response.json();
                 if (data.tasks) {
                     window.renderTasks(data.tasks);
-                } else {
-                    alert("Python server ne tasks khali bheje hain!");
                 }
             } catch (error) {
                 console.error("Assign Error:", error);
