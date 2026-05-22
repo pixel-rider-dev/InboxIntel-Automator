@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // 2. ANALYZE BUTTON (DUAL LOGIC FOR PDF & TEXT)
+    // 2. ANALYZE BUTTON (EXACT FLASK ROUTE)
     const analyzeBtn = document.getElementById('analyze-btn');
     if (analyzeBtn) {
         analyzeBtn.addEventListener('click', async function() {
@@ -26,33 +26,20 @@ document.addEventListener('DOMContentLoaded', () => {
             if (window.setButtonState) window.setButtonState('analyze-btn', true, 'Processing...');
 
             try {
-                let response;
-                
-                if (file) {
-                    // PDF UPLOAD METHOD (FormData)
-                    const formData = new FormData();
-                    formData.append('file', file);
-                    if (projectText.trim()) formData.append('text', projectText);
-                    formData.append('members', JSON.stringify(membersList));
+                // Flask hamesha FormData accept karta hai
+                const formData = new FormData();
+                if (file) formData.append('file', file);
+                if (projectText.trim()) formData.append('text', projectText);
+                formData.append('members', JSON.stringify(membersList));
 
-                    response = await fetch('https://inboxintel-automator.onrender.com/analyze', {
-                        method: 'POST',
-                        body: formData
-                    });
-                } else {
-                    // TEXT ONLY METHOD (JSON) - Yeh 100% chalega
-                    response = await fetch('https://inboxintel-automator.onrender.com/analyze', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ text: projectText, members: membersList })
-                    });
-                }
+                // EXACT LINK LAGA DIYA HAI
+                const response = await fetch('https://inboxintel-automator.onrender.com/api/analyze-skills', {
+                    method: 'POST',
+                    body: formData
+                });
 
-                // Agar FastAPI error de, toh exact error screen par dikhao
                 if (!response.ok) {
-                    const errText = await response.text();
-                    alert("FastAPI Error (" + response.status + "):\n" + errText + "\n\n(Backend server ko file format samajh nahi aa raha)");
-                    throw new Error("Backend Format Error");
+                    throw new Error("Server Error 404: Route still not found. Please check backend.");
                 }
 
                 const data = await response.json();
@@ -61,9 +48,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             } catch (error) {
                 console.error("Error:", error);
-                if (error.message !== "Backend Format Error") {
-                    alert("Render server sleep mode mein hai. 1 minute wait kar ke wapis click karein.");
-                }
+                alert("Render server is processing. Wait 1 minute and click again.");
             } finally {
                 if (window.setButtonState) window.setButtonState('analyze-btn', false, 'Analyze Required Expertise');
             }
@@ -86,31 +71,23 @@ document.addEventListener('DOMContentLoaded', () => {
                 const memberInputs = document.querySelectorAll('.member-name');
                 const membersList = Array.from(memberInputs).map(input => input.value).filter(val => val.trim() !== '');
 
-                let response;
-                if (file) {
-                    const formData = new FormData();
-                    formData.append('file', file);
-                    if (projectText.trim()) formData.append('text', projectText);
-                    formData.append('members', JSON.stringify(membersList));
+                const formData = new FormData();
+                if (file) formData.append('file', file);
+                if (projectText.trim()) formData.append('text', projectText);
+                formData.append('members', JSON.stringify(membersList));
 
-                    response = await fetch('https://inboxintel-automator.onrender.com/assign', {
-                        method: 'POST',
-                        body: formData
-                    });
-                } else {
-                    response = await fetch('https://inboxintel-automator.onrender.com/assign', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ text: projectText, members: membersList })
-                    });
-                }
+                // Assumed Task Assign Route (Agar error aaye toh isay python mein check kar lena)
+                const response = await fetch('https://inboxintel-automator.onrender.com/api/assign-tasks', {
+                    method: 'POST',
+                    body: formData
+                });
 
                 if (response.ok) {
                     const data = await response.json();
                     if (data.tasks && window.renderTasks) window.renderTasks(data.tasks);
                 } else {
                     const err = await response.text();
-                    alert("Assign Error: " + err);
+                    alert("Assign Error: Check python endpoint name for assigning tasks.");
                 }
             } catch (error) {
                 console.error("Error:", error);
