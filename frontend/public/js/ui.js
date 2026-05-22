@@ -62,14 +62,15 @@ function renderSkillMapping(skills, membersList) {
 
     skills.forEach(skill => {
         const wrapper = document.createElement('div');
-        wrapper.className = 'flex items-center justify-between bg-gray-50 p-3 rounded border border-gray-100';
+        // NAYA CHANGE: Layout ko adjust kiya taake 3 boxes fit aa sakein
+        wrapper.className = 'flex flex-col md:flex-row items-center justify-between bg-gray-50 p-3 rounded border border-gray-100 gap-3';
 
         const skillLabel = document.createElement('span');
-        skillLabel.className = 'font-bold text-[#2c3e2e] skill-name';
+        skillLabel.className = 'font-bold text-[#2c3e2e] skill-name w-full md:w-1/3';
         skillLabel.textContent = skill;
 
         const selectBox = document.createElement('select');
-        selectBox.className = 'expert-select w-1/2 p-2 border border-gray-300 rounded outline-none focus:border-[#c48f56] bg-white';
+        selectBox.className = 'expert-select w-full md:w-1/3 p-2 border border-gray-300 rounded outline-none focus:border-[#c48f56] bg-white';
         
         const defaultOpt = document.createElement('option');
         defaultOpt.value = '';
@@ -83,8 +84,15 @@ function renderSkillMapping(skills, membersList) {
             selectBox.appendChild(opt);
         });
 
+        // NAYA CHANGE: Custom Deadline Input yahan add ho gaya hai
+        const deadlineInput = document.createElement('input');
+        deadlineInput.type = 'text';
+        deadlineInput.className = 'deadline-input w-full md:w-1/3 p-2 border border-gray-300 rounded outline-none focus:border-[#c48f56]';
+        deadlineInput.placeholder = 'Deadline (e.g., 25 May, 2 Days)';
+
         wrapper.appendChild(skillLabel);
         wrapper.appendChild(selectBox);
+        wrapper.appendChild(deadlineInput); // Deadline box added to UI
         container.appendChild(wrapper);
     });
 }
