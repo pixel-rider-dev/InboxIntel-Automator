@@ -5,7 +5,7 @@
 const teamNumbers = {
     "ali": "923091511363",
     "mohiz": "923498913992",
-    "usman": "923185640987", // Apna asli number
+    "usman": "923185640987", 
     "member 4": "923000000000",
     "member 5": "923000000000"
 };
@@ -22,7 +22,6 @@ window.sendWhatsAppTask = function(assigneeName, taskDetails, taskDeadline) {
     const deadline = taskDeadline || window.globalDeadline || "No Deadline";
     const formattedName = cleanName.charAt(0).toUpperCase() + cleanName.slice(1);
     
-    // --- NAYA CHANGE: Exact required message format ---
     const customMessage = `Assalam o Alaikum ${formattedName},\n\nAI Workflow Automation system ne aapko ek naya task assign kiya hai:\n\n*Task:* ${taskDetails}\n\n*Deadline:* ${deadline}`;
     
     const encodedMessage = encodeURIComponent(customMessage);
@@ -62,15 +61,14 @@ function renderSkillMapping(skills, membersList) {
 
     skills.forEach(skill => {
         const wrapper = document.createElement('div');
-        // NAYA CHANGE: Layout ko adjust kiya taake 3 boxes fit aa sakein
-        wrapper.className = 'flex flex-col md:flex-row items-center justify-between bg-gray-50 p-3 rounded border border-gray-100 gap-3';
+        wrapper.className = 'flex items-center justify-between bg-gray-50 p-3 rounded border border-gray-100';
 
         const skillLabel = document.createElement('span');
-        skillLabel.className = 'font-bold text-[#2c3e2e] skill-name w-full md:w-1/3';
+        skillLabel.className = 'font-bold text-[#2c3e2e] skill-name';
         skillLabel.textContent = skill;
 
         const selectBox = document.createElement('select');
-        selectBox.className = 'expert-select w-full md:w-1/3 p-2 border border-gray-300 rounded outline-none focus:border-[#c48f56] bg-white';
+        selectBox.className = 'expert-select w-1/2 p-2 border border-gray-300 rounded outline-none focus:border-[#c48f56] bg-white';
         
         const defaultOpt = document.createElement('option');
         defaultOpt.value = '';
@@ -84,15 +82,8 @@ function renderSkillMapping(skills, membersList) {
             selectBox.appendChild(opt);
         });
 
-        // NAYA CHANGE: Custom Deadline Input yahan add ho gaya hai
-        const deadlineInput = document.createElement('input');
-        deadlineInput.type = 'text';
-        deadlineInput.className = 'deadline-input w-full md:w-1/3 p-2 border border-gray-300 rounded outline-none focus:border-[#c48f56]';
-        deadlineInput.placeholder = 'Deadline (e.g., 25 May, 2 Days)';
-
         wrapper.appendChild(skillLabel);
         wrapper.appendChild(selectBox);
-        wrapper.appendChild(deadlineInput); // Deadline box added to UI
         container.appendChild(wrapper);
     });
 }
