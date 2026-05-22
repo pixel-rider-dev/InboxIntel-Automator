@@ -2,7 +2,8 @@
 // WHATSAPP NOTIFICATION FEATURE (FINAL FORMAT)
 // ==========================================
 
-const teamNumbers = {
+// New name : no clash !
+const myTeamContacts = {
     "ali": "923091511363",
     "mohiz": "923498913992",
     "usman": "923185640987", 
@@ -12,7 +13,7 @@ const teamNumbers = {
 
 window.sendWhatsAppTask = function(assigneeName, taskDetails, taskDeadline) {
     const cleanName = assigneeName.toLowerCase().trim();
-    const phoneNumber = teamNumbers[cleanName];
+    const phoneNumber = myTeamContacts[cleanName]; // Yahan bhi naam update kar diya
     
     if (!phoneNumber) {
         alert(assigneeName + " ka phone number system mein update nahi hai. Pehle code mein number add karein.");
