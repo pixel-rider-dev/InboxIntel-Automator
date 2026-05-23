@@ -47,24 +47,31 @@ document.addEventListener("DOMContentLoaded", function() {
             const formData = new FormData();
             formData.append('question', question);
             
-            // Fetch project text from main.js (if available), otherwise from the textbox
+            // Fetch raw project text
             let context = window.fullProjectText || (document.getElementById('project-text') ? document.getElementById('project-text').value : '');
             
-            // Extract current task assignments from dropdowns to provide context to the AI
+            // 🔥 STRICT BOSS INSTRUCTIONS FOR AI 🔥
             let assignments = "";
             const skillRows = document.querySelectorAll('#skills-container > div');
             if (skillRows.length > 0) {
-                assignments = "\n\nCurrent Task Assignments:\n";
+                assignments = "\n\n========================================\n";
+                assignments += "CRITICAL STRICT INSTRUCTIONS FOR AI BOT:\n";
+                assignments += "1. IGNORE any placeholders like 'Member 1', 'Member 2', 'Member 3' from the text above.\n";
+                assignments += "2. The ACTUAL finalized task assignments are listed below. YOU MUST USE THESE NAMES:\n";
+                
                 skillRows.forEach(row => {
                     const skillName = row.querySelector('.skill-name').textContent;
                     const expertSelected = row.querySelector('.expert-select').value;
                     if (expertSelected) {
-                        assignments += `- ${skillName} is assigned to ${expertSelected}\n`;
+                        assignments += `-> Task: ${skillName} | Assigned to: ${expertSelected}\n`;
                     }
                 });
+                
+                assignments += `\n3. IF the user asks about ANY member NOT listed in the assignments above (for example 'Member 3' or 'Member 4'), you MUST reply exactly: 'Unko koi task assign nahi hua hai.' DO NOT guess or invent tasks for them.\n`;
+                assignments += "========================================\n";
             }
             
-            // Append final context (project details + task assignments)
+            // Append final strict context
             formData.append('context', context + assignments);
 
             // 4. Send request to the LIVE Render API
