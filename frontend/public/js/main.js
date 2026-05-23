@@ -118,7 +118,7 @@ window.renderSkillMapping = function(skills, membersList) {
 };
 
 // ==========================================
-// NEW FEATURE: WORKLOAD ANALYTICS CHART (WITH PERCENTAGES)
+// NEW FEATURE: WORKLOAD ANALYTICS CHART (MODERN COLORS)
 // ==========================================
 window.workloadChartInstance = null;
 
@@ -157,7 +157,7 @@ window.renderWorkloadChart = function(tasks) {
         window.workloadChartInstance.destroy();
     }
 
-    // Draw Premium Styled Doughnut Chart
+    // Draw Premium Styled Doughnut Chart with MODERN COLORS
     window.workloadChartInstance = new Chart(ctx, {
         type: 'doughnut',
         data: {
@@ -165,14 +165,16 @@ window.renderWorkloadChart = function(tasks) {
             datasets: [{
                 label: 'Tasks Assigned',
                 data: data,
+                // 🔥 NAYE VIBRANT TECH COLORS 🔥
                 backgroundColor: [
-                    'rgba(196, 143, 86, 0.9)', // Primary Brown
-                    'rgba(44, 62, 46, 0.9)',   // Dark Green
-                    'rgba(138, 101, 62, 0.9)',
-                    'rgba(74, 107, 77, 0.9)',
-                    'rgba(230, 200, 166, 0.9)'
+                    '#3B82F6', // Modern Blue
+                    '#10B981', // Emerald Green
+                    '#8B5CF6', // Vibrant Purple
+                    '#F59E0B', // Bright Amber
+                    '#EF4444', // Rose Red
+                    '#06B6D4'  // Cyan
                 ],
-                borderColor: ['#ffffff', '#ffffff', '#ffffff', '#ffffff', '#ffffff'],
+                borderColor: '#ffffff', // Clean white borders
                 borderWidth: 3,
                 borderRadius: 8,       
                 hoverOffset: 12        
@@ -196,16 +198,16 @@ window.renderWorkloadChart = function(tasks) {
                             size: 14,
                             weight: 'bold' // Bold text to make the percentage pop
                         },
-                        color: '#2c3e2e' 
+                        color: '#374151' // Dark grey for text
                     }
                 },
                 tooltip: {
-                    backgroundColor: '#2c3e2e', 
+                    backgroundColor: '#1F2937', // Dark sleek tooltip
                     titleFont: { size: 13, weight: 'normal' },
                     bodyFont: { size: 15, weight: 'bold' },
                     padding: 12,
                     cornerRadius: 8,
-                    displayColors: false, 
+                    displayColors: true, // Tooltip mein chota sa color box dikhayega
                     callbacks: {
                         // Tooltip mein hover karne par direct numbers aur percentage show ho
                         label: function(context) {
