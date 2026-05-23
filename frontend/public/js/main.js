@@ -118,7 +118,7 @@ window.renderSkillMapping = function(skills, membersList) {
 };
 
 // ==========================================
-// NEW FEATURE: WORKLOAD ANALYTICS CHART (PREMIUM UI)
+// NEW FEATURE: WORKLOAD ANALYTICS CHART (WITH PERCENTAGES)
 // ==========================================
 window.workloadChartInstance = null;
 
@@ -129,15 +129,27 @@ window.renderWorkloadChart = function(tasks) {
     // Show the chart section
     chartSection.classList.remove('hidden'); 
 
-    // Calculate workload (tasks per assignee)
+    // Calculate workload (tasks per assignee) and Total Tasks
     const workload = {};
+    let totalTasks = 0;
+
     tasks.forEach(task => {
         const person = task.assignee || 'Unassigned';
         workload[person] = (workload[person] || 0) + 1;
+        totalTasks++;
     });
 
-    const labels = Object.keys(workload);
+    const rawLabels = Object.keys(workload);
     const data = Object.values(workload);
+
+    // 🔥 MAGIC: Generate labels with Names and calculated Percentages 🔥
+    const labelsWithPercentages = rawLabels.map((name, index) => {
+        const percentage = Math.round((data[index] / totalTasks) * 100);
+        // Capitalize name (e.g., "mohiz" -> "Mohiz")
+        const formattedName = name.charAt(0).toUpperCase() + name.slice(1);
+        return `${formattedName} (${percentage}%)`;
+    });
+
     const ctx = document.getElementById('workloadChart').getContext('2d');
     
     // Destroy existing chart to prevent overlapping glitches
@@ -149,7 +161,7 @@ window.renderWorkloadChart = function(tasks) {
     window.workloadChartInstance = new Chart(ctx, {
         type: 'doughnut',
         data: {
-            labels: labels,
+            labels: labelsWithPercentages, // Use our new percentage labels here
             datasets: [{
                 label: 'Tasks Assigned',
                 data: data,
@@ -160,49 +172,46 @@ window.renderWorkloadChart = function(tasks) {
                     'rgba(74, 107, 77, 0.9)',
                     'rgba(230, 200, 166, 0.9)'
                 ],
-                borderColor: [
-                    '#ffffff', // White borders for clean separation
-                    '#ffffff',
-                    '#ffffff',
-                    '#ffffff',
-                    '#ffffff'
-                ],
+                borderColor: ['#ffffff', '#ffffff', '#ffffff', '#ffffff', '#ffffff'],
                 borderWidth: 3,
-                borderRadius: 8,       // Rounded slice edges
-                hoverOffset: 12        // Pop-out effect on hover
+                borderRadius: 8,       
+                hoverOffset: 12        
             }]
         },
         options: {
             responsive: true,
-            aspectRatio: 2,            // Control height for a wide, professional look
-            cutout: '75%',             // Thin, sleek ring
+            aspectRatio: 2,            
+            cutout: '75%',             
             layout: {
                 padding: 10
             },
             plugins: {
                 legend: { 
-                    position: 'right', // Shift legend to the right
+                    position: 'right', 
                     labels: {
-                        usePointStyle: true, // Use circles instead of squares
+                        usePointStyle: true, 
                         pointStyle: 'circle',
                         padding: 20,
                         font: {
-                            size: 13,
-                            weight: '600'
+                            size: 14,
+                            weight: 'bold' // Bold text to make the percentage pop
                         },
-                        color: '#4b5563' // Professional subtle grey
+                        color: '#2c3e2e' 
                     }
                 },
                 tooltip: {
-                    backgroundColor: '#2c3e2e', // Dark theme tooltip
+                    backgroundColor: '#2c3e2e', 
                     titleFont: { size: 13, weight: 'normal' },
                     bodyFont: { size: 15, weight: 'bold' },
                     padding: 12,
                     cornerRadius: 8,
-                    displayColors: false, // Hide extra color box in tooltip
+                    displayColors: false, 
                     callbacks: {
+                        // Tooltip mein hover karne par direct numbers aur percentage show ho
                         label: function(context) {
-                            return ` Assigned: ${context.parsed} Tasks`;
+                            const count = context.parsed;
+                            const percentage = Math.round((count / totalTasks) * 100);
+                            return ` Workload: ${count} Tasks (${percentage}%)`;
                         }
                     }
                 }
