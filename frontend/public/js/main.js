@@ -5,7 +5,7 @@
 window.teamNumbers = {};
 
 window.sendWhatsAppTask = function(assigneeName, taskDetails, taskDeadline) {
-    // Naam ko lowercase mein badal kar check karega (Taa ke Mohiz, MOHIZ, mohiz sab chal jaye)
+    // Convert name to lowercase to ensure case-insensitive matching
     const cleanName = assigneeName.toLowerCase().trim();
     const phoneNumber = window.teamNumbers[cleanName];
     
@@ -28,7 +28,7 @@ window.generateMemberInputs = function(count) {
     container.innerHTML = ''; 
     
     for (let i = 1; i <= count; i++) {
-        // Har member ke liye ek wrapper banayenge jo Name aur Phone ko ek line mein rakhega
+        // Create a wrapper for each member to keep Name and Phone in the same row
         const wrapper = document.createElement('div');
         wrapper.className = 'member-wrapper flex space-x-2 w-full';
 
@@ -59,9 +59,9 @@ function getDynamicMembers() {
         const phone = wrapper.querySelector('.member-phone').value.trim();
         
         if (name) {
-            membersList.push(name); // For API only name is imp
+            membersList.push(name); // Only the name is required for the API payload
             if (phone) {
-                // For whatsapp button save name and phone
+                // Save name and phone mapping for the WhatsApp notification feature
                 window.teamNumbers[name.toLowerCase()] = phone;
             }
         }
@@ -117,6 +117,56 @@ window.renderSkillMapping = function(skills, membersList) {
     });
 };
 
+// ==========================================
+// NEW FEATURE: WORKLOAD ANALYTICS CHART
+// ==========================================
+// Global variable to keep track of the chart instance for destruction on re-render
+window.workloadChartInstance = null;
+
+window.renderWorkloadChart = function(tasks) {
+    const chartSection = document.getElementById('chart-section');
+    if (!chartSection) return;
+    
+    // Show the chart section
+    chartSection.classList.remove('hidden'); 
+
+    // Calculate workload (tasks per assignee)
+    const workload = {};
+    tasks.forEach(task => {
+        const person = task.assignee || 'Unassigned';
+        workload[person] = (workload[person] || 0) + 1;
+    });
+
+    const labels = Object.keys(workload);
+    const data = Object.values(workload);
+    const ctx = document.getElementById('workloadChart').getContext('2d');
+    
+    // Destroy existing chart to prevent overlapping glitches if tasks are reassigned
+    if (window.workloadChartInstance) {
+        window.workloadChartInstance.destroy();
+    }
+
+    // Draw new Doughnut Chart matching the theme colors
+    window.workloadChartInstance = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Tasks Assigned',
+                data: data,
+                backgroundColor: ['#c48f56', '#2c3e2e', '#4a6b4d', '#e6c8a6', '#8a653e', '#d1d5db'],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { position: 'bottom' }
+            }
+        }
+    });
+};
+
 window.renderTasks = function(tasks) {
     const container = document.getElementById('tasks-container');
     if (!container) return;
@@ -149,6 +199,9 @@ window.renderTasks = function(tasks) {
         `;
         container.appendChild(card);
     });
+
+    // Automatically generate the analytics chart right after rendering tasks
+    window.renderWorkloadChart(tasks);
 };
 
 window.setButtonState = function(btnId, isLoading, defaultText) {
@@ -185,7 +238,7 @@ window.onload = function() {
             const fileInput = document.getElementById('file-upload');
             const file = fileInput && fileInput.files.length > 0 ? fileInput.files[0] : null;
             
-            // Now dynamic memebrs extract (Names + Phones)
+            // Extract dynamic members (Names and Phone Numbers)
             const membersList = getDynamicMembers();
 
             if (!projectText.trim() && !file) {
