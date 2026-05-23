@@ -5,13 +5,13 @@ document.addEventListener("DOMContentLoaded", function() {
 
     if (!chatSendBtn || !chatInput || !chatBody) return;
 
-    // Chat box mein message dikhane ka function
+    // Function to display messages in the chat box
     function addMessage(text, sender) {
         const msgDiv = document.createElement('div');
         msgDiv.className = `flex w-full ${sender === 'user' ? 'justify-end' : 'justify-start'} mb-4`;
         
         const innerDiv = document.createElement('div');
-        // User ka message brown color mein, aur bot ka white mein
+        // User message in brown, bot message in white
         innerDiv.className = sender === 'user' 
             ? 'bg-[#c48f56] text-white p-3 rounded-lg rounded-tr-none max-w-[85%] shadow-sm' 
             : 'bg-white border border-gray-200 text-gray-800 p-3 rounded-lg rounded-tl-none max-w-[85%] shadow-sm';
@@ -20,20 +20,20 @@ document.addEventListener("DOMContentLoaded", function() {
         msgDiv.appendChild(innerDiv);
         chatBody.appendChild(msgDiv);
         
-        // Auto scroll to bottom
+        // Auto scroll to the bottom
         chatBody.scrollTop = chatBody.scrollHeight;
     }
 
-    // Message send karne ka main function
+    // Main function to handle sending messages
     async function sendMessage() {
         const question = chatInput.value.trim();
         if (!question) return;
 
-        // 1. Screen par user ka sawal dikhao
+        // 1. Display user's question on the screen
         addMessage(question, 'user');
-        chatInput.value = ''; // Input box khali kar do
+        chatInput.value = ''; // Clear the input box
 
-        // 2. Loading animation dikhao
+        // 2. Show loading animation
         const loadingId = 'loading-' + Date.now();
         const loadingDiv = document.createElement('div');
         loadingDiv.id = loadingId;
@@ -43,21 +43,37 @@ document.addEventListener("DOMContentLoaded", function() {
         chatBody.scrollTop = chatBody.scrollHeight;
 
         try {
-            // 3. Backend ko bhejne ke liye data taiyar karo
+            // 3. Prepare form data to send to the backend
             const formData = new FormData();
             formData.append('question', question);
             
-            // Project ka data main.js se uthao (agar hai), warna textbox se
-            const context = window.fullProjectText || (document.getElementById('project-text') ? document.getElementById('project-text').value : '');
-            formData.append('context', context);
+            // Fetch project text from main.js (if available), otherwise from the textbox
+            let context = window.fullProjectText || (document.getElementById('project-text') ? document.getElementById('project-text').value : '');
+            
+            // Extract current task assignments from dropdowns to provide context to the AI
+            let assignments = "";
+            const skillRows = document.querySelectorAll('#skills-container > div');
+            if (skillRows.length > 0) {
+                assignments = "\n\nCurrent Task Assignments:\n";
+                skillRows.forEach(row => {
+                    const skillName = row.querySelector('.skill-name').textContent;
+                    const expertSelected = row.querySelector('.expert-select').value;
+                    if (expertSelected) {
+                        assignments += `- ${skillName} is assigned to ${expertSelected}\n`;
+                    }
+                });
+            }
+            
+            // Append final context (project details + task assignments)
+            formData.append('context', context + assignments);
 
-            // 4. LIVE Render API par request bhejo
+            // 4. Send request to the LIVE Render API
             const response = await fetch('https://inboxintel-automator.onrender.com/api/chat', {
                 method: 'POST',
                 body: formData
             });
 
-            // Loading hata do
+            // Remove loading animation
             const loadingElement = document.getElementById(loadingId);
             if (loadingElement) loadingElement.remove();
 
@@ -67,13 +83,13 @@ document.addEventListener("DOMContentLoaded", function() {
 
             const data = await response.json();
             
-            // 5. AI ka jawab screen par dikhao
+            // 5. Display AI's response on the screen
             if (data.answer) {
                 addMessage(data.answer, 'bot');
             } else if (data.error) {
                 addMessage("Error: " + data.error, 'bot');
             } else {
-                addMessage("Sorry, main samajh nahi paya.", 'bot');
+                addMessage("Sorry, I couldn't understand that.", 'bot');
             }
 
         } catch (error) {
@@ -85,10 +101,10 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     }
 
-    // Button click karne par message bhejo
+    // Send message on button click
     chatSendBtn.addEventListener('click', sendMessage);
 
-    // Enter key dabane par bhi message bhejo
+    // Send message on pressing the Enter key
     chatInput.addEventListener('keypress', function(e) {
         if (e.key === 'Enter') {
             sendMessage();

@@ -103,7 +103,7 @@ window.renderTasks = function(tasks) {
     container.innerHTML = ''; 
     
     tasks.forEach(task => {
-        // YAHAN HAI MAGIC: Hum AI wali task.deadline ko ignore kar ke globalDeadline use kar rahe hain
+        //Here is the magic: We are ignoring the AI task deadline and using the global deadline instead.
         const finalDeadline = window.globalDeadline || "No Deadline";
 
         const card = document.createElement('div');
@@ -211,7 +211,7 @@ window.onload = function() {
             window.setButtonState('confirm-btn', true, 'Assigning Tasks...');
             
             try {
-                // 1. Dropdowns se data ikhata karna (Expertise Mapping)
+                // 1. Collect data from dropdowns (Expertise Mapping).
                 const expertiseMapping = {};
                 const skillRows = document.querySelectorAll('#skills-container > div');
                 skillRows.forEach(row => {
@@ -222,14 +222,14 @@ window.onload = function() {
                     }
                 });
 
-                // 2. Sirf wohi data bhejna jo backend /process-update ko chahiye
+                // 2.Send only the data that the backend /process-update actually requires.
                 const formData = new FormData();
                 const projectText = window.fullProjectText || (document.getElementById('project-text') ? document.getElementById('project-text').value : '');
                 
                 formData.append('text', projectText);
                 formData.append('expertise_mapping', JSON.stringify(expertiseMapping));
 
-                // 3. API ka sahi rasta: /process-update
+                // 3. correct way of API: /process-update
                 const response = await fetch('https://inboxintel-automator.onrender.com/api/process-update', {
                     method: 'POST',
                     body: formData
