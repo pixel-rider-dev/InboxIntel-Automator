@@ -118,9 +118,8 @@ window.renderSkillMapping = function(skills, membersList) {
 };
 
 // ==========================================
-// NEW FEATURE: WORKLOAD ANALYTICS CHART
+// NEW FEATURE: WORKLOAD ANALYTICS CHART (PREMIUM UI)
 // ==========================================
-// Global variable to keep track of the chart instance for destruction on re-render
 window.workloadChartInstance = null;
 
 window.renderWorkloadChart = function(tasks) {
@@ -141,12 +140,12 @@ window.renderWorkloadChart = function(tasks) {
     const data = Object.values(workload);
     const ctx = document.getElementById('workloadChart').getContext('2d');
     
-    // Destroy existing chart to prevent overlapping glitches if tasks are reassigned
+    // Destroy existing chart to prevent overlapping glitches
     if (window.workloadChartInstance) {
         window.workloadChartInstance.destroy();
     }
 
-    // Draw new Doughnut Chart matching the theme colors
+    // Draw Premium Styled Doughnut Chart
     window.workloadChartInstance = new Chart(ctx, {
         type: 'doughnut',
         data: {
@@ -154,14 +153,59 @@ window.renderWorkloadChart = function(tasks) {
             datasets: [{
                 label: 'Tasks Assigned',
                 data: data,
-                backgroundColor: ['#c48f56', '#2c3e2e', '#4a6b4d', '#e6c8a6', '#8a653e', '#d1d5db'],
-                borderWidth: 1
+                backgroundColor: [
+                    'rgba(196, 143, 86, 0.9)', // Primary Brown
+                    'rgba(44, 62, 46, 0.9)',   // Dark Green
+                    'rgba(138, 101, 62, 0.9)',
+                    'rgba(74, 107, 77, 0.9)',
+                    'rgba(230, 200, 166, 0.9)'
+                ],
+                borderColor: [
+                    '#ffffff', // White borders for clean separation
+                    '#ffffff',
+                    '#ffffff',
+                    '#ffffff',
+                    '#ffffff'
+                ],
+                borderWidth: 3,
+                borderRadius: 8,       // Rounded slice edges
+                hoverOffset: 12        // Pop-out effect on hover
             }]
         },
         options: {
             responsive: true,
+            aspectRatio: 2,            // Control height for a wide, professional look
+            cutout: '75%',             // Thin, sleek ring
+            layout: {
+                padding: 10
+            },
             plugins: {
-                legend: { position: 'bottom' }
+                legend: { 
+                    position: 'right', // Shift legend to the right
+                    labels: {
+                        usePointStyle: true, // Use circles instead of squares
+                        pointStyle: 'circle',
+                        padding: 20,
+                        font: {
+                            size: 13,
+                            weight: '600'
+                        },
+                        color: '#4b5563' // Professional subtle grey
+                    }
+                },
+                tooltip: {
+                    backgroundColor: '#2c3e2e', // Dark theme tooltip
+                    titleFont: { size: 13, weight: 'normal' },
+                    bodyFont: { size: 15, weight: 'bold' },
+                    padding: 12,
+                    cornerRadius: 8,
+                    displayColors: false, // Hide extra color box in tooltip
+                    callbacks: {
+                        label: function(context) {
+                            return ` Assigned: ${context.parsed} Tasks`;
+                        }
+                    }
+                }
             }
         }
     });
