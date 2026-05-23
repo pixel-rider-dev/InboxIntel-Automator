@@ -3,10 +3,10 @@
 // ==========================================
 window.teamNumbers = {
     "usman": "923185640987",
-    "ali": "923111111111",
+    "ali": "923091511363",
     "mohiz": "923498913992", 
-    "fatima": "923333333333",
-    "zain": "923444444444"
+    "uu":"923328338223",
+    "member 5": "923444444444"
 };
 
 window.sendWhatsAppTask = function(assigneeName, taskDetails, taskDeadline) {
