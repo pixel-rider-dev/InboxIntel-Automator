@@ -48,31 +48,33 @@ document.addEventListener("DOMContentLoaded", function() {
             formData.append('question', question);
             
             // Fetch raw project text
-            let context = window.fullProjectText || (document.getElementById('project-text') ? document.getElementById('project-text').value : '');
+            let rawContext = window.fullProjectText || (document.getElementById('project-text') ? document.getElementById('project-text').value : '');
+            let finalContext = "";
             
-            // 🔥 STRICT BOSS INSTRUCTIONS FOR AI 🔥
-            let assignments = "";
+            // 🔥 PUTTING STRICT INSTRUCTIONS AT THE VERY TOP SO AI READS THEM FIRST 🔥
             const skillRows = document.querySelectorAll('#skills-container > div');
             if (skillRows.length > 0) {
-                assignments = "\n\n========================================\n";
-                assignments += "CRITICAL STRICT INSTRUCTIONS FOR AI BOT:\n";
-                assignments += "1. IGNORE any placeholders like 'Member 1', 'Member 2', 'Member 3' from the text above.\n";
-                assignments += "2. The ACTUAL finalized task assignments are listed below. YOU MUST USE THESE NAMES:\n";
+                finalContext += "=== SYSTEM ALERT: STRICT RULES FOR THIS CHAT ===\n";
+                finalContext += "1. YOU MUST ONLY USE THE 'FINALIZED ASSIGNMENTS' BELOW TO ANSWER 'WHO IS DOING WHAT'.\n";
+                finalContext += "2. COMPLETELY IGNORE names like 'Member 1', 'Member 2', 'Member 3' from the Original Draft.\n";
+                finalContext += "3. If the user asks about a member or person NOT in the Finalized Assignments list, reply EXACTLY with: 'Unko koi task assign nahi hua hai.' Do not invent or guess tasks.\n\n";
+                finalContext += "--- FINALIZED ASSIGNMENTS ---\n";
                 
                 skillRows.forEach(row => {
                     const skillName = row.querySelector('.skill-name').textContent;
                     const expertSelected = row.querySelector('.expert-select').value;
                     if (expertSelected) {
-                        assignments += `-> Task: ${skillName} | Assigned to: ${expertSelected}\n`;
+                        finalContext += `Task: ${skillName} -> Assigned to: ${expertSelected}\n`;
                     }
                 });
-                
-                assignments += `\n3. IF the user asks about ANY member NOT listed in the assignments above (for example 'Member 3' or 'Member 4'), you MUST reply exactly: 'Unko koi task assign nahi hua hai.' DO NOT guess or invent tasks for them.\n`;
-                assignments += "========================================\n";
+                finalContext += "================================================\n\n";
             }
             
-            // Append final strict context
-            formData.append('context', context + assignments);
+            // Append the original text AT THE BOTTOM, with a warning to the AI
+            finalContext += "--- ORIGINAL PROJECT DRAFT (Use ONLY for understanding the project concept, NOT for assignments) ---\n";
+            finalContext += rawContext;
+
+            formData.append('context', finalContext);
 
             // 4. Send request to the LIVE Render API
             const response = await fetch('https://inboxintel-automator.onrender.com/api/chat', {
