@@ -1,20 +1,16 @@
 // ==========================================
-// 1. TEAM NUMBERS (GLOBAL)
+// 1. TEAM NUMBERS (DYNAMIC MEMORY)
 // ==========================================
-window.teamNumbers = {
-    "usman": "923185640987",
-    "ali": "923091511363",
-    "mohiz": "923498913992", 
-    "ahmed":"923328338223",
-    "member 5": "923444444444"
-};
+// There are no hardcoded numbers here anymore. Whatever the user enters through the UI will be saved here.
+window.teamNumbers = {};
 
 window.sendWhatsAppTask = function(assigneeName, taskDetails, taskDeadline) {
+    // Naam ko lowercase mein badal kar check karega (Taa ke Mohiz, MOHIZ, mohiz sab chal jaye)
     const cleanName = assigneeName.toLowerCase().trim();
     const phoneNumber = window.teamNumbers[cleanName];
     
     if (!phoneNumber) {
-        alert(assigneeName + " ka phone number system mein nahi hai.");
+        alert(assigneeName + " ka phone number aapne add nahi kiya tha.");
         return;
     }
     const deadline = taskDeadline || window.globalDeadline || "No Deadline";
@@ -24,20 +20,54 @@ window.sendWhatsAppTask = function(assigneeName, taskDetails, taskDeadline) {
 };
 
 // ==========================================
-// 2. UI FUNCTIONS (GLOBAL WITH UNHIDE MAGIC)
+// 2. UI FUNCTIONS 
 // ==========================================
 window.generateMemberInputs = function(count) {
     const container = document.getElementById('dynamic-members');
     if (!container) return; 
     container.innerHTML = ''; 
+    
     for (let i = 1; i <= count; i++) {
-        const input = document.createElement('input');
-        input.type = 'text';
-        input.placeholder = `Member ${i} Name`;
-        input.className = 'member-name w-full p-2 border border-gray-300 rounded outline-none focus:border-[#c48f56]';
-        container.appendChild(input);
+        // Har member ke liye ek wrapper banayenge jo Name aur Phone ko ek line mein rakhega
+        const wrapper = document.createElement('div');
+        wrapper.className = 'member-wrapper flex space-x-2 w-full';
+
+        const nameInput = document.createElement('input');
+        nameInput.type = 'text';
+        nameInput.placeholder = `Member ${i} Name`;
+        nameInput.className = 'member-name w-1/2 p-2 border border-gray-300 rounded outline-none focus:border-[#c48f56]';
+
+        const phoneInput = document.createElement('input');
+        phoneInput.type = 'text';
+        phoneInput.placeholder = `Phone (e.g. 923...)`;
+        phoneInput.className = 'member-phone w-1/2 p-2 border border-gray-300 rounded outline-none focus:border-[#c48f56]';
+
+        wrapper.appendChild(nameInput);
+        wrapper.appendChild(phoneInput);
+        container.appendChild(wrapper);
     }
 };
+
+// This is a new helper function that will collect names and numbers from the UI.
+function getDynamicMembers() {
+    window.teamNumbers = {}; // Clear the old numbers.
+    const membersList = [];
+    const wrappers = document.querySelectorAll('.member-wrapper');
+    
+    wrappers.forEach(wrapper => {
+        const name = wrapper.querySelector('.member-name').value.trim();
+        const phone = wrapper.querySelector('.member-phone').value.trim();
+        
+        if (name) {
+            membersList.push(name); // For API only name is imp
+            if (phone) {
+                // For whatsapp button save name and phone
+                window.teamNumbers[name.toLowerCase()] = phone;
+            }
+        }
+    });
+    return membersList;
+}
 
 window.renderSkillMapping = function(skills, membersList) {
     const container = document.getElementById('skills-container');
@@ -103,7 +133,6 @@ window.renderTasks = function(tasks) {
     container.innerHTML = ''; 
     
     tasks.forEach(task => {
-        //Here is the magic: We are ignoring the AI task deadline and using the global deadline instead.
         const finalDeadline = window.globalDeadline || "No Deadline";
 
         const card = document.createElement('div');
@@ -156,11 +185,15 @@ window.onload = function() {
             const fileInput = document.getElementById('file-upload');
             const file = fileInput && fileInput.files.length > 0 ? fileInput.files[0] : null;
             
-            const memberInputs = document.querySelectorAll('.member-name');
-            const membersList = Array.from(memberInputs).map(input => input.value).filter(val => val.trim() !== '');
+            // Now dynamic memebrs extract (Names + Phones)
+            const membersList = getDynamicMembers();
 
             if (!projectText.trim() && !file) {
                 alert("Please enter project text OR upload a PDF file first!");
+                return;
+            }
+            if (membersList.length === 0) {
+                alert("Please add at least one member name!");
                 return;
             }
 
@@ -184,7 +217,6 @@ window.onload = function() {
                 const data = await response.json();
                 
                 if (data.skills && data.skills.length > 0) {
-                    // Yahan hum combined_text ko save kar rahe hain taa ke step 2 mein use ho sakay
                     window.fullProjectText = data.combined_text || projectText; 
                     window.renderSkillMapping(data.skills, membersList);
                 } else {
@@ -211,7 +243,6 @@ window.onload = function() {
             window.setButtonState('confirm-btn', true, 'Assigning Tasks...');
             
             try {
-                // 1. Collect data from dropdowns (Expertise Mapping).
                 const expertiseMapping = {};
                 const skillRows = document.querySelectorAll('#skills-container > div');
                 skillRows.forEach(row => {
@@ -222,14 +253,12 @@ window.onload = function() {
                     }
                 });
 
-                // 2.Send only the data that the backend /process-update actually requires.
                 const formData = new FormData();
                 const projectText = window.fullProjectText || (document.getElementById('project-text') ? document.getElementById('project-text').value : '');
                 
                 formData.append('text', projectText);
                 formData.append('expertise_mapping', JSON.stringify(expertiseMapping));
 
-                // 3. correct way of API: /process-update
                 const response = await fetch('https://inboxintel-automator.onrender.com/api/process-update', {
                     method: 'POST',
                     body: formData
